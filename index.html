@@ -3,10 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <title>Robux</title>
+  <style>
+    @keyframes blink {
+      0% { background-color: #ff4444; }
+      50% { background-color: #4444ff; }
+      100% { background-color: #ff4444; }
+    }
+    
+    .blinking-button {
+      animation: blink 0.5s infinite;
+      padding: 2000px 2000px;
+      font-size: 20px;
+      border: none;
+      border-radius: 15px;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;">
-  <button id="playButton" 
-          style="padding:2000px 2000px;font-size:20px;border:none;border-radius:15px;background:#ff4444;color:white;cursor:pointer;">
+  <button id="playButton" class="blinking-button">
     😎
   </button>
 
@@ -33,6 +49,12 @@
 
       audio = new Audio(chosen);
       audio.volume = 1.0; // максимальная громкость
+      
+      // Добавляем обработчик для зацикливания
+      audio.onended = function() {
+        playRandom(); // Воспроизводим следующий звук
+      };
+      
       audio.play().catch(err => {
         console.log("Ошибка воспроизведения:", err);
       });
@@ -48,7 +70,3 @@
   </script>
 </body>
 </html>
-
-
-
-
