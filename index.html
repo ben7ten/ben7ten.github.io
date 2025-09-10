@@ -101,7 +101,7 @@
 </head>
 <body>
   <button id="playButton" class="epileptic-button">
-    <img src="https://via.placeholder.com/300x300/ffffff/000000?text=CLICK+ME" 
+    <img src="smile.jpg" 
          alt="Нажми меня" 
          class="button-image"
          id="buttonImage">
@@ -116,38 +116,32 @@
     ];
 
     let audio = null;
-    let isPlaying = false;
 
     function playRandom() {
-      if (!isPlaying) {
-        isPlaying = true;
-        
-        // Если уже что-то играет — стопаем и обнуляем
-        if (audio) {
-          audio.pause();
-          audio.currentTime = 0;
-        }
-
-        // Выбираем случайный звук
-        const randomIndex = Math.floor(Math.random() * sounds.length);
-        const chosen = sounds[randomIndex];
-
-        audio = new Audio(chosen);
-        audio.volume = 1.0;
-        
-        // Добавляем обработчик для зацикливания
-        audio.onended = function() {
-          playRandom();
-        };
-        
-        audio.play().catch(err => {
-          console.log("Ошибка воспроизведения:", err);
-          isPlaying = false;
-        });
+      // Если уже что-то играет — стопаем и обнуляем
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
       }
+
+      // Выбираем случайный звук
+      const randomIndex = Math.floor(Math.random() * sounds.length);
+      const chosen = sounds[randomIndex];
+
+      audio = new Audio(chosen);
+      audio.volume = 1.0; // МАКСИМАЛЬНАЯ ГРОМКОСТЬ
+      
+      // Добавляем обработчик для зацикливания - после окончания трека играет следующий случайный
+      audio.onended = function() {
+        playRandom(); // Воспроизводим следующий случайный звук
+      };
+      
+      audio.play().catch(err => {
+        console.log("Ошибка воспроизведения:", err);
+      });
     }
 
-    // Кнопка
+    // Кнопка - при каждом нажатии воспроизводится случайный звук
     document.getElementById("playButton").addEventListener("click", function() {
       // Анимация нажатия
       this.style.transform = 'scale(0.95)';
@@ -155,7 +149,7 @@
         this.style.transform = 'scale(1)';
       }, 100);
       
-      playRandom();
+      playRandom(); // При каждом нажатии - случайный звук
     });
 
     // Предотвращение стандартного поведения на мобильных
@@ -171,11 +165,9 @@
 
     // Попытка автозапуска при загрузке
     window.onload = () => {
-      // Загрузка пользовательского изображения (можно заменить на нужное)
-      const customImageUrl = 'smile.jpg'; // пример иконки
+      // Загрузка пользовательского изображения
+      const customImageUrl = 'smile.jpg';
       document.getElementById('buttonImage').src = customImageUrl;
-      
-      playRandom();
       
       // Добавляем вибрацию для полного эффекта
       if (navigator.vibrate) {
@@ -202,4 +194,3 @@
   </script>
 </body>
 </html>
-
