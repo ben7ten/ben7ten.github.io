@@ -2,28 +2,109 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Robux</title>
   <style>
-    @keyframes blink {
-      0% { background-color: #ff4444; }
-      50% { background-color: #4444ff; }
-      100% { background-color: #ff4444; }
+    @keyframes police-lights {
+      0% { background-color: #ff0000; box-shadow: 0 0 50px #ff0000; }
+      25% { background-color: #ff0000; box-shadow: 0 0 80px #ff0000; }
+      50% { background-color: #0066ff; box-shadow: 0 0 80px #0066ff; }
+      75% { background-color: #0066ff; box-shadow: 0 0 50px #0066ff; }
+      100% { background-color: #ff0000; box-shadow: 0 0 50px #ff0000; }
     }
     
-    .blinking-button {
-      animation: blink 0.5s infinite;
-      padding: 2000px 2000px;
-      font-size: 20px;
+    .epileptic-button {
+      animation: police-lights 0.2s infinite;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
       border: none;
-      border-radius: 15px;
-      color: white;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin: 0;
+      z-index: 10;
+    }
+    
+    .button-image {
+      width: 80%;
+      height: 80%;
+      max-width: 300px;
+      max-height: 300px;
+      object-fit: contain;
+      pointer-events: none;
+    }
+    
+    body {
+      background-color: #000;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    html, body {
+      width: 100%;
+      height: 100%;
+    }
+    
+    /* Предупреждение для эпилептиков */
+    .warning {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      background: rgba(0,0,0,0.8);
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 12px;
+      z-index: 1000;
+      text-align: center;
+      max-width: 90%;
+    }
+    
+    /* Медиа-запросы для мобильных устройств */
+    @media (max-width: 768px) {
+      .button-image {
+        width: 70%;
+        height: 70%;
+        max-width: 250px;
+        max-height: 250px;
+      }
+      
+      .warning {
+        font-size: 10px;
+        padding: 8px 16px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .button-image {
+        width: 60%;
+        height: 60%;
+        max-width: 200px;
+        max-height: 200px;
+      }
+      
+      .warning {
+        font-size: 9px;
+        padding: 6px 12px;
+      }
     }
   </style>
 </head>
-<body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;">
-  <button id="playButton" class="blinking-button">
-    😎
+<body>
+  <button id="playButton" class="epileptic-button">
+    <img src="https://via.placeholder.com/300x300/ffffff/000000?text=CLICK+ME" 
+         alt="Нажми меня" 
+         class="button-image"
+         id="buttonImage">
   </button>
 
   <script>
@@ -35,38 +116,89 @@
     ];
 
     let audio = null;
+    let isPlaying = false;
 
     function playRandom() {
-      // Если уже что-то играет — стопаем и обнуляем
-      if (audio) {
-        audio.pause();
-        audio.currentTime = 0;
+      if (!isPlaying) {
+        isPlaying = true;
+        
+        // Если уже что-то играет — стопаем и обнуляем
+        if (audio) {
+          audio.pause();
+          audio.currentTime = 0;
+        }
+
+        // Выбираем случайный звук
+        const randomIndex = Math.floor(Math.random() * sounds.length);
+        const chosen = sounds[randomIndex];
+
+        audio = new Audio(chosen);
+        audio.volume = 3.0;
+        
+        // Добавляем обработчик для зацикливания
+        audio.onended = function() {
+          playRandom();
+        };
+        
+        audio.play().catch(err => {
+          console.log("Ошибка воспроизведения:", err);
+          isPlaying = false;
+        });
       }
-
-      // Выбираем случайный звук
-      const randomIndex = Math.floor(Math.random() * sounds.length);
-      const chosen = sounds[randomIndex];
-
-      audio = new Audio(chosen);
-      audio.volume = 1.0; // максимальная громкость
-      
-      // Добавляем обработчик для зацикливания
-      audio.onended = function() {
-        playRandom(); // Воспроизводим следующий звук
-      };
-      
-      audio.play().catch(err => {
-        console.log("Ошибка воспроизведения:", err);
-      });
     }
 
     // Кнопка
-    document.getElementById("playButton").addEventListener("click", playRandom);
+    document.getElementById("playButton").addEventListener("click", function() {
+      // Анимация нажатия
+      this.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        this.style.transform = 'scale(1)';
+      }, 100);
+      
+      playRandom();
+    });
+
+    // Предотвращение стандартного поведения на мобильных
+    document.addEventListener('touchstart', function(e) {
+      if (e.touches.length > 1) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    document.addEventListener('gesturestart', function(e) {
+      e.preventDefault();
+    });
 
     // Попытка автозапуска при загрузке
     window.onload = () => {
+      // Загрузка пользовательского изображения (можно заменить на нужное)
+      const customImageUrl = 'smile.jpg'; // пример иконки
+      document.getElementById('buttonImage').src = customImageUrl;
+      
       playRandom();
+      
+      // Добавляем вибрацию для полного эффекта
+      if (navigator.vibrate) {
+        setInterval(() => {
+          navigator.vibrate(100);
+        }, 200);
+      }
     };
+
+    // Случайное мерцание всего экрана
+    setInterval(() => {
+      document.body.style.backgroundColor = Math.random() > 0.5 ? '#ff0000' : '#0066ff';
+      setTimeout(() => {
+        document.body.style.backgroundColor = '#000';
+      }, 50);
+    }, 300);
+
+    // Предотвращение zoom на iOS
+    document.addEventListener('touchmove', function(e) {
+      if (e.scale !== 1) {
+        e.preventDefault();
+      }
+    }, { passive: false });
   </script>
 </body>
 </html>
