@@ -5,21 +5,49 @@
   <title>Robux</title>
 </head>
 <body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;">
-  <audio id="sound" src="sound.mp3"></audio>
-  <button onclick="document.getElementById('sound').play()" 
+  <button id="playButton" 
           style="padding:1000px 1000px;font-size:20px;border:none;border-radius:15px;background:#ff4444;color:white;cursor:pointer;">
     ▶ Запустить звук
   </button>
 
   <script>
-    // Попытка автозапуска (работает не во всех браузерах)
-    window.onload = () => {
-      const audio = document.getElementById('sound');
-      audio.play().catch(() => {
-        console.log("Автовоспроизведение заблокировано, ждём клика.");
+    // Список звуков
+    const sounds = [
+      "sound1.mp3",
+      "sound2.mp3",
+      "sound3.mp3"
+    ];
+
+    let audio = null;
+
+    function playRandom() {
+      // Если уже что-то играет — стопаем и обнуляем
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+
+      // Выбираем случайный звук
+      const randomIndex = Math.floor(Math.random() * sounds.length);
+      const chosen = sounds[randomIndex];
+
+      audio = new Audio(chosen);
+      audio.volume = 1.0; // максимальная громкость
+      audio.play().catch(err => {
+        console.log("Ошибка воспроизведения:", err);
       });
+    }
+
+    // Кнопка
+    document.getElementById("playButton").addEventListener("click", playRandom);
+
+    // Попытка автозапуска при загрузке
+    window.onload = () => {
+      playRandom();
     };
   </script>
 </body>
 </html>
+
+
 
