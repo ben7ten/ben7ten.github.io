@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Будешь моим Валентином?</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5; /* Светлый фон как в видео */
+            font-family: 'Arial', sans-serif;
+            overflow: hidden; /* Чтобы кнопка не улетала за скролл */
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+        }
+
+        img {
+            width: 100%;
+            max-width: 250px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            position: relative; /* Важно для позиционирования */
+            min-height: 60px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-weight: bold;
+        }
+
+        #yesBtn {
+            background-color: #d12e68; /* Малиновый цвет как в видео */
+            color: white;
+        }
+
+        #yesBtn:hover {
+            background-color: #b02355;
+            transform: scale(1.05);
+        }
+
+        #noBtn {
+            background-color: #e0e0e0;
+            color: #333;
+            position: absolute; /* Чтобы кнопка могла свободно двигаться */
+            right: 40px; /* Начальная позиция */
+        }
+
+        /* Класс для скрытия элементов */
+        .hidden {
+            display: none;
+        }
+        
+        /* Стили для финального текста */
+        .success-text {
+            color: #d12e68;
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="questionScreen">
+        <img src="https://media.tenor.com/EfH47d84dD8AAAAi/bear-blow-kiss.gif" alt="Bear" id="mainImage">
+        
+        <h1 id="questionText">Дима Будешь моим Валентином?</h1>
+        
+        <div class="buttons">
+            <button id="yesBtn">ДА</button>
+            <button id="noBtn">НЕТ</button>
+        </div>
+    </div>
+
+    <div class="container hidden" id="successScreen">
+        <img src="https://media.tenor.com/bX7XfXNqQIQAAAAC/manchester-city-champions.gif" alt="Celebration">
+        <div class="success-text">УРААА !!!!</div>
+    </div>
+
+    <script>
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const questionScreen = document.getElementById('questionScreen');
+        const successScreen = document.getElementById('successScreen');
+
+        // Фразы из твоего видео
+        const phrases = [
+            "НЕТ",
+            "Мне грустно",
+            "Ну пожалуйста",
+            "Я тебя умоляю",
+            "Я буду рядом",
+            "Я не шучу",
+            "Ну не надо",
+            "Я верю в нас",
+            "Я сделаю как ты хочешь",
+            "Давай попробуем",
+            "Это судьба",
+            "Не разбивай сердечко",
+            "Я уже почти плачу"
+        ];
+
+        let phraseIndex = 0;
+
+        // Логика убегающей кнопки
+        function moveButton() {
+            // Получаем размеры окна
+            const maxX = window.innerWidth - noBtn.offsetWidth - 50;
+            const maxY = window.innerHeight - noBtn.offsetHeight - 50;
+
+            // Генерируем случайные координаты
+            const randomX = Math.random() * maxX;
+            const randomY = Math.random() * maxY;
+
+            // Применяем новые координаты (position fixed позволяет двигать по всему экрану)
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+
+            // Меняем текст кнопки
+            phraseIndex = (phraseIndex + 1) % phrases.length;
+            noBtn.innerText = phrases[phraseIndex];
+        }
+
+        // События для мыши (компьютер) и тача (телефон)
+        noBtn.addEventListener('mouseover', moveButton);
+        noBtn.addEventListener('touchstart', moveButton); // Чтобы работало на телефоне
+
+        // Логика нажатия на "ДА"
+        yesBtn.addEventListener('click', () => {
+            questionScreen.classList.add('hidden');
+            successScreen.classList.remove('hidden');
+            
+            // Если хочешь музыку, раскомментируй код ниже (но браузеры блокируют автоплей)
+            // const audio = new Audio('music.mp3');
+            // audio.play();
+        });
+    </script>
+</body>
+</html>
