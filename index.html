@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Будешь моим Валентином?</title>
+    <title>Вопрос</title>
     <style>
         body {
             display: flex;
@@ -11,90 +11,104 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f0f2f5; /* Светлый фон как в видео */
+            background-color: #fce4ec; /* Нежно-розовый фон */
             font-family: 'Arial', sans-serif;
-            overflow: hidden; /* Чтобы кнопка не улетала за скролл */
+            overflow: hidden; 
         }
 
         .container {
             text-align: center;
             background: white;
             padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             max-width: 400px;
             width: 90%;
             position: relative;
+            z-index: 10;
         }
 
         img {
             width: 100%;
-            max-width: 250px;
-            border-radius: 10px;
+            height: auto;
+            max-height: 250px;
+            object-fit: cover;
+            border-radius: 15px;
             margin-bottom: 20px;
         }
 
         h1 {
-            font-size: 24px;
-            color: #333;
+            font-size: 26px;
+            color: #d81b60;
             margin-bottom: 30px;
+            line-height: 1.3;
         }
 
+        /* Контейнер для кнопок, чтобы они стояли ровно */
         .buttons {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            position: relative; /* Важно для позиционирования */
-            min-height: 60px;
+            align-items: center;
+            gap: 30px; /* Расстояние между кнопками */
+            width: 100%;
         }
 
         button {
-            padding: 15px 30px;
+            padding: 15px 0; /* Высота кнопок */
+            width: 120px;    /* Фиксированная ширина для симметрии */
             font-size: 18px;
             border: none;
-            border-radius: 8px;
+            border-radius: 50px; /* Закругленные кнопки */
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.2s, background-color 0.2s;
             font-weight: bold;
+            outline: none;
         }
 
         #yesBtn {
-            background-color: #d12e68; /* Малиновый цвет как в видео */
+            background-color: #d81b60;
             color: white;
+            box-shadow: 0 4px 15px rgba(216, 27, 96, 0.3);
         }
 
         #yesBtn:hover {
-            background-color: #b02355;
+            background-color: #ad1457;
             transform: scale(1.05);
         }
 
         #noBtn {
-            background-color: #e0e0e0;
+            background-color: #eeeeee;
             color: #333;
-            position: absolute; /* Чтобы кнопка могла свободно двигаться */
-            right: 40px; /* Начальная позиция */
+            /* Убрали position: absolute, теперь она стоит в потоке */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
-        /* Класс для скрытия элементов */
+        /* Класс для скрытия */
         .hidden {
             display: none;
         }
         
-        /* Стили для финального текста */
         .success-text {
-            color: #d12e68;
+            color: #d81b60;
             font-size: 32px;
             font-weight: bold;
             margin-top: 20px;
+            animation: popIn 0.5s ease;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
 <body>
 
     <div class="container" id="questionScreen">
-        <img src="bear.gif" alt="Bear" id="mainImage">
+        <img src="bear.gif" alt="Bear">
         
-        <h1 id="questionText">Женя будешь валентинкой?</h1>
+        <h1>Женя, будешь валентинкой?</h1>
         
         <div class="buttons">
             <button id="yesBtn">ДА</button>
@@ -103,8 +117,8 @@
     </div>
 
     <div class="container hidden" id="successScreen">
-        <img src="happy.gif" alt="Celebration">
-        <div class="success-text">УРААА !!!!</div>
+        <img src="happy.gif" alt="Success">
+        <div class="success-text">УРААА !!!! ❤️</div>
     </div>
 
     <script>
@@ -113,57 +127,56 @@
         const questionScreen = document.getElementById('questionScreen');
         const successScreen = document.getElementById('successScreen');
 
-        // Фразы из твоего видео
+        // Фразы, которые будут появляться на убегающей кнопке
         const phrases = [
             "НЕТ",
-            "Мне грустно",
+            "Точно?",
+            "Подумай!",
+            "Не делай так",
+            "С ума сошел?",
+            "Сердечко болит",
+            "Я буду плакать",
             "Ну пожалуйста",
-            "Я тебя умоляю",
-            "Я буду рядом",
-            "Я не шучу",
-            "Ну не надо",
-            "Я верю в нас",
-            "Я сделаю как ты хочешь",
-            "Давай попробуем",
-            "Это судьба",
-            "Не разбивай сердечко",
-            "Я уже почти плачу"
+            "Жми ДА!",
+            "Всё равно ДА",
+            "Ты не уйдешь",
+            "Это судьба"
         ];
 
         let phraseIndex = 0;
 
-        // Логика убегающей кнопки
         function moveButton() {
-            // Получаем размеры окна
-            const maxX = window.innerWidth - noBtn.offsetWidth - 50;
-            const maxY = window.innerHeight - noBtn.offsetHeight - 50;
+            // Как только мы наводим мышь, кнопка вырывается из потока (становится абсолютной)
+            noBtn.style.position = 'fixed'; 
+            
+            // Вычисляем размеры окна, чтобы кнопка не улетела за край
+            const maxX = window.innerWidth - noBtn.offsetWidth - 20;
+            const maxY = window.innerHeight - noBtn.offsetHeight - 20;
 
-            // Генерируем случайные координаты
             const randomX = Math.random() * maxX;
             const randomY = Math.random() * maxY;
 
-            // Применяем новые координаты (position fixed позволяет двигать по всему экрану)
-            noBtn.style.position = 'fixed';
             noBtn.style.left = randomX + 'px';
             noBtn.style.top = randomY + 'px';
-
-            // Меняем текст кнопки
+            
+            // Меняем текст и цвет, чтобы сбить с толку
             phraseIndex = (phraseIndex + 1) % phrases.length;
             noBtn.innerText = phrases[phraseIndex];
+            
+            // Немного меняем цвет кнопки при каждом движении для паники
+            const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+            // Можно раскомментировать строку ниже, если хочешь, чтобы кнопка меняла цвет
+            // noBtn.style.backgroundColor = randomColor; 
         }
 
-        // События для мыши (компьютер) и тача (телефон)
+        // События
         noBtn.addEventListener('mouseover', moveButton);
-        noBtn.addEventListener('touchstart', moveButton); // Чтобы работало на телефоне
+        noBtn.addEventListener('click', moveButton); // На случай, если он успеет нажать
+        noBtn.addEventListener('touchstart', moveButton); // Для телефона
 
-        // Логика нажатия на "ДА"
         yesBtn.addEventListener('click', () => {
             questionScreen.classList.add('hidden');
             successScreen.classList.remove('hidden');
-            
-            // Если хочешь музыку, раскомментируй код ниже (но браузеры блокируют автоплей)
-            // const audio = new Audio('music.mp3');
-            // audio.play();
         });
     </script>
 </body>
